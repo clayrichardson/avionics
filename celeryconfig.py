@@ -1,0 +1,11 @@
+
+BROKER_URL = 'redis://localhost:6379/0'
+
+BROKER_CONNECTION_MAX_RETRIES = None
+
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 30}  # 30 seconds
+
+CELERYD_CONCURRENCY = 4
+
+CELERY_MAX_CACHED_RESULTS = 1
+
