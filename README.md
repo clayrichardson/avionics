@@ -1,3 +1,10 @@
+# Prerequisites
+
+1. Install Redis: `brew install redis`
+2. Install requirements via Pip: `pip install -r requirements.txt`
+
+# Running the Avionics Services
+
 Start redis
 ---
 redis-server ./redis.conf
