@@ -1,6 +1,5 @@
 
-celery[redis]
+gevent
 flask
-flower
 requests
 
