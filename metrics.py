@@ -8,54 +8,60 @@ from gevent.pool import Pool
 import time
 import requests
 import json
+import pkgutil
+import inspect
 
-from  random import randint
+from random import randint
 
-pool_size = 100
-pool = Pool(pool_size)
-metrics = Queue()
+class Shared():
+
+  transmit_pool_size = 100
+  metrics = Queue()
+
+  sensors = []
+  sensor_instances = []
+
+  sensor_threads = []
+  collector_threads = []
+
+  number_sensors = 0
+
+  threads = []
+
+shared = Shared()
+
+modules = pkgutil.iter_modules(path=["./sensors"])
+for loader, mod_name, ispkg in modules: 
+  loaded_mod = __import__("sensors."+mod_name, fromlist=[mod_name])
+  possible_sensor_classes = []
+  for item in dir(loaded_mod):
+    if item.lower() == mod_name.lower():
+      possible_sensor_classes.append(item)
+
+  if len(possible_sensor_classes) != 1:
+    print "Cannot find sensor class in module %s" % mod_name
+    continue
+  else:
+    class_name = possible_sensor_classes[0]
+    shared.sensors.append({
+      'loaded_mod': loaded_mod,
+      'class': class_name,
+      'instance': getattr(loaded_mod, class_name)(shared)
+    })
+
+shared.number_sensors = len(shared.sensors)
+
+print "Sensors found: %s" % shared.number_sensors
+
 
 def send(data):
   with open("./logfile", "a") as outfile:
     outfile.write(json.dumps(data) + "\n")
-  metrics.put_nowait(data)
-
-def metric_metric1():
-  while 1:
-    data = {
-      'time': time.time(),
-      'name': 'metric1',
-      'value': randint(1, 1000)
-    }
-    # print "queueing metric1"
-    send(data)
-    gevent.sleep()
-
-def metric_metric2():
-  while 1:
-    data = {
-      'time': time.time(),
-      'name': 'metric2',
-      'value': randint(1, 1000)
-    }
-    # print "queueing metric2"
-    send(data)
-    gevent.sleep()
-
-def metric_queue_size():
-  while 1:
-    data = {
-      'time': time.time(),
-      'name': 'queue size',
-      'value': metrics.qsize()
-    }
-    # print "queueing metric2"
-    send(data)
-    gevent.sleep()
+  shared.metrics.put_nowait(data)
 
 def metric_collector():
   while 1:
-    metric = metrics.get()
+    metric = shared.metrics.get()
 
     while 1:
       try:
@@ -67,14 +73,20 @@ def metric_collector():
         continue
       break
 
-for number in xrange(pool_size):
-  if not pool.full():
-    print "Spawning pool worker #%s" % number 
-    pool.spawn(metric_collector)
+def sensor_greenlet(sensor):
+  while 1:
+    send(sensor['instance'].run())
+    gevent.sleep()
 
-gevent.joinall([
-  gevent.spawn(metric_metric1),
-  gevent.spawn(metric_metric2),
-  gevent.spawn(metric_queue_size),
-])
+for number in xrange(shared.transmit_pool_size):
+  print "Spawning pool worker #%s" % number 
+  shared.collector_threads.append(gevent.spawn(metric_collector))
+
+for sensor in shared.sensors:
+  print "Spawning sensor greenlet: %s" % sensor['class']
+  shared.sensor_threads.append(gevent.spawn(sensor_greenlet, sensor))
+
+shared.threads = shared.collector_threads + shared.sensor_threads
+
+gevent.joinall(shared.threads)
 
