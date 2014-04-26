@@ -15,7 +15,7 @@ from random import randint
 
 class Shared():
 
-  transmit_pool_size = 100
+  transmit_pool_size = 1
   metrics = Queue()
 
   sensors = []
@@ -65,8 +65,10 @@ def metric_collector():
 
     while 1:
       try:
-        r = requests.post("http://127.0.0.1:5000", data=metric)
+        #headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+        r = requests.post("http://192.168.2.5:5000", data=metric)
         print "Status: %s Metric: %s" % (r.status_code, metric)
+        #print "Metric: %s" % (metric)
         gevent.sleep()
       except:
         print "Request failed, retrying."
@@ -75,7 +77,11 @@ def metric_collector():
 
 def sensor_greenlet(sensor):
   while 1:
-    send(sensor['instance'].run())
+    data = sensor['instance'].collect()
+    if isinstance(data, list):
+      for item in data:
+        send(item)
+    else: send(data)
     gevent.sleep()
 
 for number in xrange(shared.transmit_pool_size):
