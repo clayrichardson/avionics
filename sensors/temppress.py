@@ -26,5 +26,5 @@ class TempPress(object):
         'value': float(self.sensor.readAltitude())
       }
     ]
-    time.sleep(100)
+    time.sleep(.1)
     return data

@@ -10,5 +10,5 @@ class QueueSize(object):
       'name': 'Queue Size',
       'value': self.shared.metrics.qsize()
     }
-    time.sleep(100)
+    time.sleep(1)
     return data
