@@ -14,38 +14,38 @@ class AccelMagno(object):
       {
         'time': time.time(),
         'name': 'accelerometer x',
-        'value': sensor_data[0][0]
+        'value': float(sensor_data[0][0])
       },
       {
         'time': time.time(),
         'name': 'accelerometer y',
-        'value': sensor_data[0][1]
+        'value': float(sensor_data[0][1])
       },
       {
         'time': time.time(),
         'name': 'accelerometer z',
-        'value': sensor_data[0][2]
+        'value': float(sensor_data[0][2])
       },
       {
         'time': time.time(),
         'name': 'magnometer x',
-        'value': sensor_data[1][0]
+        'value': float(sensor_data[1][0])
       },
       {
         'time': time.time(),
         'name': 'magnometer y',
-        'value': sensor_data[1][1]
+        'value': float(sensor_data[1][1])
       },
       {
         'time': time.time(),
         'name': 'magnometer z',
-        'value': sensor_data[1][2]
+        'value': float(sensor_data[1][2])
       },
       {
         'time': time.time(),
         'name': 'magnometer orientation',
-        'value': sensor_data[1][3]
+        'value': float(sensor_data[1][3])
       }
     ]
-    time.sleep(0.01)
+    time.sleep(0.1)
     return data

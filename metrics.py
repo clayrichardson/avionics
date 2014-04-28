@@ -66,9 +66,9 @@ def metric_collector():
     while 1:
       try:
         #headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        r = requests.post("http://192.168.2.5:5000", data=metric)
-        print "Status: %s Metric: %s" % (r.status_code, metric)
-        #print "Metric: %s" % (metric)
+        #r = requests.post("http://192.168.2.5:5000", data=metric)
+        #print "Status: %s Metric: %s" % (r.status_code, metric)
+        print "Value: %s Metric: %s" % (metric['value'], metric['name'])
         gevent.sleep()
       except:
         print "Request failed, retrying."

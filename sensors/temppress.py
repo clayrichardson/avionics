@@ -13,18 +13,18 @@ class TempPress(object):
       {
         'time': time.time(),
         'name': 'pressure',
-        'value': self.sensor.readPressure()
+        'value': float(self.sensor.readPressure())
       },
       {
         'time': time.time(),
         'name': 'temperature',
-        'value': self.sensor.readTemperature()
+        'value': float(self.sensor.readTemperature())
       },
       {
         'time': time.time(),
         'name': 'altitude',
-        'value': self.sensor.readAltitude()
+        'value': float(self.sensor.readAltitude())
       }
     ]
-    time.sleep(0.01)
+    time.sleep(100)
     return data
